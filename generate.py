@@ -1,9 +1,12 @@
-#coding:utf-8
 #!/usr/bin/python3
+#coding:utf-8
+
 import tensorflow as tf
 import numpy as np
 import helper
 import problem_unittests as tests
+
+# np.set_printoptions(threshold='nan')
 
 _, vocab_to_int, int_to_vocab, token_dict = helper.load_preprocess()
 seq_length, load_dir = helper.load_params()
@@ -22,37 +25,33 @@ def get_tensors(loaded_graph):
 
 def pick_word(probabilities, int_to_vocab):
    
-    chances = []
-    
+    ret = []
+   
+    base = 0.05
+    print("len(probabilities): " + str(len(probabilities)))
     for idx, prob in enumerate(probabilities):
-        if prob >= 0.05:
-            chances.append(int_to_vocab[idx])
+        if prob >= base:
+            print(prob)
+            base = prob
+            ret.append(int_to_vocab[idx])
     
-    rand = np.random.randint(0, len(chances))
-    
-    return str(chances[rand])
+    return str(ret[-1])
 
-# 生成文本的长度
-gen_length = 500
+gen_length = 150
 
-# 文章开头的字，指定一个即可，这个字必须是在训练词汇列表中的
 prime_word = '章'
-
+print(prime_word)
 
 loaded_graph = tf.Graph()
 with tf.Session(graph=loaded_graph) as sess:
-    # 加载保存过的session
     loader = tf.train.import_meta_graph(load_dir + '.meta')
     loader.restore(sess, load_dir)
 
-    # 通过名称获取缓存的tensor
     input_text, initial_state, final_state, probs = get_tensors(loaded_graph)
 
-    # 准备开始生成文本
     gen_sentences = [prime_word]
     prev_state = sess.run(initial_state, {input_text: np.array([[1]])})
 
-    # 开始生成文本
     for n in range(gen_length):
         dyn_input = [[vocab_to_int[word] for word in gen_sentences[-seq_length:]]]
         dyn_seq_length = len(dyn_input[0])
@@ -61,11 +60,10 @@ with tf.Session(graph=loaded_graph) as sess:
             [probs, final_state],
             {input_text: dyn_input, initial_state: prev_state})
         
-        pred_word = pick_word(probabilities[dyn_seq_length - 1], int_to_vocab)
+        pred_word = pick_word(probabilities[0][dyn_seq_length - 1], int_to_vocab)
 
         gen_sentences.append(pred_word)
     
-    # 将标点符号还原
     novel = ''.join(gen_sentences)
     for key, token in token_dict.items():
         ending = ' ' if key in ['\n', '（', '“'] else ''
