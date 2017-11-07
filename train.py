@@ -6,7 +6,6 @@ from distutils.version import LooseVersion
 import warnings
 import tensorflow as tf
 import numpy as np
-import helper
 import preprocess
 from tensorflow.contrib import seq2seq
 
@@ -145,5 +144,5 @@ if __name__ == '__main__':
         saver.save(sess, save_dir)
         print('Model Trained and Saved')
     
-    helper.save_params((seq_length, save_dir))
+    pickle.dump((seq_length, save_dir), open('params.p', 'wb'))
 

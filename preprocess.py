@@ -14,8 +14,6 @@ def load_text(path):
 def create_lookup_tables(input_data):
     
     vocab = set(input_data)
-    print("===== vocab")
-    print(vocab)
     
     vocab_to_int = {word: idx for idx, word in enumerate(vocab)}
     
@@ -30,6 +28,7 @@ def token_lookup():
 
 def load_data():
     return pickle.load(open('preprocess.p', mode='rb'))
+
 
 if __name__ == '__main__':
     num_words_for_training = 100000

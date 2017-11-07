@@ -3,13 +3,13 @@
 
 import tensorflow as tf
 import numpy as np
-import helper
 import problem_unittests as tests
+import pickle
 
 # np.set_printoptions(threshold='nan')
 
-_, vocab_to_int, int_to_vocab, token_dict = helper.load_preprocess()
-seq_length, load_dir = helper.load_params()
+_, vocab_to_int, int_to_vocab, token_dict = pickle.load(open('preprocess.p', mode='rb'))
+seq_length, load_dir = pickle.load(open('params.p', mode='rb'))
 
 def get_tensors(loaded_graph):
    
